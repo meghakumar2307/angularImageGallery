@@ -1,33 +1,20 @@
 const uploadFile = require("../middleware/upload");
-var imageModel = require('../models/imageModel');
+var galleryModel = require('../models/imageModel');
 const fs = require('fs');
 
 const upload = async (req, res) => {
   try {
-
-    /* store the uploaded images on server using multer */
+     /* store the uploaded images on server using multer */
     await uploadFile(req, res);
 
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
 
-    /* server side validation to upload only the image files*/
-    // Allowed formats
-    const filetypes = /jpeg|jpg|png|gif/;
-    // Check extension
-    const extname = filetypes.test(path.extname(req.file.originalname).toLowerCase());
-    // Check mimetype in file data
-    const mimetype = filetypes.test(req.file.mimetype);
-
-    if(!(mimetype && extname)){
-       return res.status(400).send({ message: "Please upload an image file!" });
-    }
-
     /* save their file paths in DB */
     req.body.fileSource = '/static/assets/uploads/'+req.file.originalname;
 
-    imageModel.create(req.body).then(async (data, err) => {
+    galleryModel.create(req.body).then(async (data, err) => {
         if(err){
             console.log(err);
         }else{
