@@ -1,0 +1,36 @@
+<div class="container">    
+  <div class="row">    
+    <div class="col-sm-12 btn btn-primary">    
+      My Image Gallery 
+      <a class="btn btn-success pull-right" [routerLink]="['/upload']">Image upload</a>      
+    </div>    
+  </div>    
+  <div class="m-1">       
+    <button (click)="filterBy='all'">All Tags</button>       
+    <button (click)="filterBy='tag1'">Tag 1</button>    
+    <button (click)="filterBy='tag2'">Tag 2</button>     
+    <button (click)="filterBy='tag3'">Tag 3</button>  
+  </div>    
+  <div class="row justify-content-md-center">
+    <div class="bg-image m-1" style="max-width: 22rem;" *ngFor="let img of (allImages | filterimages:filterBy)">
+      <a [routerLink]="['/image', img.id]">    
+        <img src="{{img.url}}" class="img" width="240" height="170" >    
+      </a> 
+      <div class="mask text-light d-flex justify-content-center flex-column text-center" style="background-color: rgba(0, 0, 0, 0.5)">
+        <button class="btn btn-primary" (click)="filterBy=img.tags">{{img.tags}}</button>
+      </div>
+    </div>
+
+<div class="card mt-3">
+  <div class="card-header">List of Files</div>
+  <ul
+    class="list-group list-group-flush"
+    *ngFor="let file of fileInfos | async"
+  >
+    <li class="list-group-item">
+      <a [routerLink]="['/image', file.id]"><img src="{{file.url}}" class="img" width="240" height="170" >   </a>
+    </li>
+  </ul>
+</div>
+  </div>     
+</div>    
