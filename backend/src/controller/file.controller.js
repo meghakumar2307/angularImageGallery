@@ -38,7 +38,14 @@ const upload = async (req, res) => {
 };
 
 const getListFiles = (req, res) => {
-  galleryModel.find({}).then((data, err) => {
+  console.log(req.params)
+  let page = req.params.page;
+  let limit = req.params.limit;
+
+  galleryModel.find({})
+    .skip((parseInt(page)-1) * parseInt(limit))
+    .limit(parseInt(limit))
+    .then((data, err) => {
     if(err) 
        res.status(500).send({
         message: "Unable to scan files!",
@@ -63,12 +70,19 @@ const getFileDetail = (req, res) => {
 };
 
 const getListFilesByTagName = (req, res, next) => {
-  galleryModel.find({'tags': { $regex: '.*' + req.params.tagName + '.*' }}).then((data, err) => {
-    if(err) 
+  let page = req.params.page;
+  let limit = req.params.limit;
+
+  galleryModel.find({'tags': { $regex: '.*' + req.params.tagName + '.*' }})
+    .skip((parseInt(page)-1) * parseInt(limit))
+    .limit(parseInt(limit))
+    .then((data, err) => {
+    if(err) {
+      console.log(err);
        res.status(500).send({
         message: "Unable to scan file!",
       });
-
+    }
     console.log(data);
     res.status(200).send(data);
   })
@@ -76,6 +90,9 @@ const getListFilesByTagName = (req, res, next) => {
 
 
 const getFilesBySearch = (req, res, next) => {
+  let page = req.params.page;
+  let limit = req.params.limit;
+
   galleryModel.find({
             $or: [
               {'title': { $regex: '.*' + req.params.searchText + '.*' }}, 
@@ -83,7 +100,10 @@ const getFilesBySearch = (req, res, next) => {
               {'description': { $regex: '.*' + req.params.searchText + '.*' }},
               {'fileSorce': { $regex: '.*' + req.params.searchText + '.*' }}
             ]
-        }).then((data, err) => {
+        })
+    .skip((parseInt(page)-1) * parseInt(limit))
+    .limit(parseInt(limit))
+    .then((data, err) => {
     if(err) 
        res.status(500).send({
         message: "Unable to scan file!",
@@ -104,7 +124,7 @@ const getListTags = (req, res) => {
     data.forEach((tag, index) => {
       if(tag.indexOf(',') > -1) {
         let tags = tag.split(',');
-        data.splice(index, 1);
+        delete data[index];
         tags.forEach((t) => {
           data.push(t);
         });
@@ -115,10 +135,40 @@ const getListTags = (req, res) => {
         return i == self.indexOf(v);
     });
 
-    console.log(data, err);
     res.status(200).send(data);
   })
 };
+
+
+const getCount = (req, res) => {
+  let condition = {};
+
+  if(req.params.type == "tags") {
+    condition = {'tags': { $regex: '.*' + req.params.value + '.*' }};
+  }
+  if(req.params.type == "search") {
+    condition = {
+            $or: [
+              {'title': { $regex: '.*' + req.params.value + '.*' }}, 
+              {'tags': { $regex: '.*' + req.params.value + '.*' }},
+              {'description': { $regex: '.*' + req.params.value + '.*' }},
+              {'fileSorce': { $regex: '.*' + req.params.value + '.*' }}
+            ]
+        };
+  }
+
+  galleryModel.count(condition)
+    .then((count, err) => {
+    if(err) 
+       res.status(500).send({
+        message: "Unable to count files!",
+      });
+
+    console.log(count);
+    res.status(200).send({"data":count});
+  })
+}
+
 
 
 module.exports = {
@@ -127,5 +177,6 @@ module.exports = {
   getFileDetail,
   getListFilesByTagName,
   getFilesBySearch,
-  getListTags
+  getListTags,
+  getCount
 };

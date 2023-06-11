@@ -27,23 +27,27 @@ export class FileUploadService {
     return this.http.request(req);
   }
 
-  getFiles(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/files`);
+  getFiles(page: number, limit: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/files/${page}/${limit}`);
   }
 
   getFileDetails(fileId): Observable<any> {
     return this.http.get(`${this.baseUrl}/detail/${fileId}`);
   }
 
-  getFilesByTagName(tagName): Observable<any> {
-    return this.http.get(`${this.baseUrl}/files/${tagName}`);
+  getFilesByTagName(tagName, page: number, limit: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/files/${tagName}/${page}/${limit}`);
   }
 
-  getFilesBySearch(searchText): Observable<any> {
-    return this.http.get(`${this.baseUrl}/search/${searchText}`);
+  getFilesBySearch(searchText, page: number, limit: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/search/${searchText}/${page}/${limit}`);
   }
 
   getTags(): Observable<any> {
     return this.http.get(`${this.baseUrl}/tags`);
+  }
+
+  getFilesCount(type="all", value="all"): Observable<any> {
+    return this.http.get(`${this.baseUrl}/count/${type}/${value}`);
   }
 }

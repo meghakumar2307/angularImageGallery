@@ -13,7 +13,7 @@
     </div>    
   </div>    
   <div class="row justify-content-md-center">
-    <div class="bg-image m-1" style="max-width: 22rem;" *ngFor="let img of fileInfos | async">
+    <div class="bg-image m-1" style="max-width: 22rem;" *ngFor="let img of fileInfos | async | paginate: { itemsPerPage: limit, currentPage: page, totalItems: total  }">
       <a (click)="openModal(template, img._id)">    
         <img src="{{baseUrl}}{{img.fileSource}}" class="img" width="240" height="170" >
       </a> 
@@ -21,6 +21,9 @@
         <button class="btn btn-primary m-1" *ngFor="let tag of img.tags|splitComma" (click) = "filterByImageTag(tag)">{{tag}}</button>
       </div>
     </div>
+  </div>
+  <div class="pagination pagination-sm m-0 float-right">
+    <pagination-controls (pageChange)="getPage($event)"></pagination-controls>
   </div>
 </div>
 
