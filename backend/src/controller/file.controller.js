@@ -8,7 +8,7 @@ const upload = async (req, res) => {
     await uploadFile(req, res);
 
     if (req.file == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
+      return res.status(400).send({ message: "Please upload an image file!" });
     }
 
     /* save their file paths in DB */
@@ -38,43 +38,94 @@ const upload = async (req, res) => {
 };
 
 const getListFiles = (req, res) => {
-  const directoryPath = __basedir + "/public/static/assets/uploads/";
-
-  fs.readdir(directoryPath, function (err, files) {
-    if (err) {
-      res.status(500).send({
+  galleryModel.find({}).then((data, err) => {
+    if(err) 
+       res.status(500).send({
         message: "Unable to scan files!",
       });
-    }
 
-    let fileInfos = [];
+    console.log(data);
+    res.status(200).send(data);
+  })
+};
 
-    files.forEach((file) => {
-      fileInfos.push({
-        name: file,
-        url: "http://localhost:8080/static/assets/uploads/" + file,
+
+const getFileDetail = (req, res) => {
+  galleryModel.find({'_id': req.params.id}).then((data, err) => {
+    if(err) 
+       res.status(500).send({
+        message: "Unable to scan file!",
       });
+
+    console.log(data);
+    res.status(200).send(data);
+  })
+};
+
+const getListFilesByTagName = (req, res, next) => {
+  galleryModel.find({'tags': { $regex: '.*' + req.params.tagName + '.*' }}).then((data, err) => {
+    if(err) 
+       res.status(500).send({
+        message: "Unable to scan file!",
+      });
+
+    console.log(data);
+    res.status(200).send(data);
+  })
+};
+
+
+const getFilesBySearch = (req, res, next) => {
+  galleryModel.find({
+            $or: [
+              {'title': { $regex: '.*' + req.params.searchText + '.*' }}, 
+              {'tags': { $regex: '.*' + req.params.searchText + '.*' }},
+              {'description': { $regex: '.*' + req.params.searchText + '.*' }},
+              {'fileSorce': { $regex: '.*' + req.params.searchText + '.*' }}
+            ]
+        }).then((data, err) => {
+    if(err) 
+       res.status(500).send({
+        message: "Unable to scan file!",
+      });
+
+    console.log(data);
+    res.status(200).send(data);
+  })
+};
+
+const getListTags = (req, res) => {
+  galleryModel.find({}).distinct('tags').then((data, err) => {
+    if(err) 
+       res.status(500).send({
+        message: "Unable to scan files!",
+      });
+
+    data.forEach((tag, index) => {
+      if(tag.indexOf(',') > -1) {
+        let tags = tag.split(',');
+        data.splice(index, 1);
+        tags.forEach((t) => {
+          data.push(t);
+        });
+      }
     });
 
-    res.status(200).send(fileInfos);
-  });
+    data = data.filter(function(v, i, self) {  
+        return i == self.indexOf(v);
+    });
+
+    console.log(data, err);
+    res.status(200).send(data);
+  })
 };
 
-const download = (req, res) => {
-  const fileName = req.params.name;
-  const directoryPath = __basedir + "/public/static/assets/uploads/";
-
-  res.download(directoryPath + fileName, fileName, (err) => {
-    if (err) {
-      res.status(500).send({
-        message: "Could not download the file. " + err,
-      });
-    }
-  });
-};
 
 module.exports = {
   upload,
   getListFiles,
-  download,
+  getFileDetail,
+  getListFilesByTagName,
+  getFilesBySearch,
+  getListTags
 };

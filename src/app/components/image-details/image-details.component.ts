@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-
-import { ImageService } from '../../services/image.service';    
-import { ActivatedRoute } from '@angular/router'    
-
+import { Component, OnInit, Input, OnChanges } from '@angular/core';
+import { FileUploadService } from '../../services/file-upload.service';  
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router' ;
 
 @Component({
   selector: 'app-image-details',
   templateUrl: './image-details.component.html',
   styleUrls: ['./image-details.component.css']
 })
-export class ImageDetailsComponent {
+export class ImageDetailsComponent implements OnChanges  {
 
- image:any    
+ baseUrl = environment.apiURL;
+ fileDetails?: Observable<any>;
     
-  constructor(private imageService: ImageService,    
-    private route: ActivatedRoute) { }    
+  constructor(private uploadService: FileUploadService, private route: ActivatedRoute) {
+    this.fileDetails = this.uploadService.getFileDetails(this.route.snapshot.params['id']);
+  }    
     
-  ngOnInit(){    
-    this.image = this.imageService.getImage(    
-      this.route.snapshot.params['id']    
-    )    
+  ngOnChanges(){    
+    this.fileDetails = this.uploadService.getFileDetails(this.route.snapshot.params['id']);
   }    
 
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { FileUploadService } from '../../services/file-upload.service';
+import { Router } from '@angular/router' ;
 
 @Component({
   selector: 'app-image-upload',
@@ -12,9 +13,7 @@ export class ImageUploadComponent implements OnInit {
 	
 	selectedFiles?: FileList;
 	currentFile?: File;
-	progress = 0;
 	message = '';
-	fileInfos?: Observable<any>;
 
 	formData = {
     	title: '',
@@ -23,10 +22,15 @@ export class ImageUploadComponent implements OnInit {
     	description: ''
   	};
 
-  constructor(private uploadService: FileUploadService) { }
+  constructor(private uploadService: FileUploadService, private router: Router) { }
 
   ngOnInit() {
-  	 this.fileInfos = this.uploadService.getFiles();
+  	 
+  }
+
+  onSelect(tag) : void {
+    console.log('tag selected: value is ' + tag);
+    console.log(this.formData.tags);
   }
 
   selectFile(event: any): void {
@@ -34,8 +38,6 @@ export class ImageUploadComponent implements OnInit {
   }
 
   upload(): void {
-    this.progress = 0;
-
     if (this.selectedFiles) {
       const file: File | null = this.selectedFiles.item(0);
 
@@ -44,16 +46,10 @@ export class ImageUploadComponent implements OnInit {
 
         this.uploadService.upload(this.currentFile, this.formData).subscribe(
           (event: any) => {
-            if (event.type === HttpEventType.UploadProgress) {
-              this.progress = Math.round(100 * event.loaded / event.total);
-            } else if (event instanceof HttpResponse) {
               this.message = event.body.message;
-              this.fileInfos = this.uploadService.getFiles();
-            }
           },
           (err: any) => {
             console.log(err);
-            this.progress = 0;
 
             if (err.error && err.error.message) {
               this.message = err.error.message;
@@ -65,7 +61,7 @@ export class ImageUploadComponent implements OnInit {
           });
 
       }
-
+      this.router.navigate(['/gallery']);
       this.selectedFiles = undefined;
     }
   }

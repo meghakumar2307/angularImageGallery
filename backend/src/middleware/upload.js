@@ -14,6 +14,13 @@ let storage = multer.diskStorage({
 let uploadFile = multer({
   storage: storage,
   limits: { fileSize: maxSize },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+      cb(null, true);
+    } else {
+      cb(null, false);
+    }
+  }
 }).single("file");
 
 let uploadFileMiddleware = util.promisify(uploadFile);

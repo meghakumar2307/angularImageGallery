@@ -10,9 +10,9 @@
         Image Title 
       </label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       <label class="btn btn-default p-0">
-        <input type="text" [(ngModel)] = "formData.title" />
+        <input type="text" class="form-control"  [(ngModel)] = "formData.title" />
       </label>
     </div>
   </div>
@@ -22,21 +22,25 @@
         Image Tags 
       </label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       <label class="btn btn-default p-0">
-        <input type="text" [(ngModel)] = "formData.tags" />
+        <tag-input class="p-0" [(ngModel)]="formData.tags"
+                   (onSelect)="onSelect($event)"
+                   [modelAsStrings]="true">
+        </tag-input>
+        <input type="text" [(ngModel)] = "formData.tags" class="d-none"/>
       </label>
     </div>
   </div>
   <div class="row justify-content-md-center m-3">
     <div class="col-md-2">
-      <label lass="btn btn-default p-0">
+      <label class="btn btn-default p-0">
         Image description 
       </label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       <label class="btn btn-default p-0">
-        <textarea [(ngModel)] = "formData.description" ></textarea>
+        <textarea class="form-control" [(ngModel)] = "formData.description" ></textarea>
       </label>
     </div>
   </div>
@@ -46,7 +50,7 @@
         Select Image
       </label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
       <label class="btn btn-default p-0">
         <input type="file" accept="image/*" (change)="selectFile($event)" />
       </label>

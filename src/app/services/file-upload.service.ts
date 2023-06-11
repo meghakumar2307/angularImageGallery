@@ -30,4 +30,20 @@ export class FileUploadService {
   getFiles(): Observable<any> {
     return this.http.get(`${this.baseUrl}/files`);
   }
+
+  getFileDetails(fileId): Observable<any> {
+    return this.http.get(`${this.baseUrl}/detail/${fileId}`);
+  }
+
+  getFilesByTagName(tagName): Observable<any> {
+    return this.http.get(`${this.baseUrl}/files/${tagName}`);
+  }
+
+  getFilesBySearch(searchText): Observable<any> {
+    return this.http.get(`${this.baseUrl}/search/${searchText}`);
+  }
+
+  getTags(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/tags`);
+  }
 }
